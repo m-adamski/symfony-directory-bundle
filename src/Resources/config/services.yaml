@@ -1,0 +1,11 @@
+services:
+    directory_bundle.helper.directory:
+        class: Adamski\Symfony\DirectoryBundle\Helper\DirectoryHelper
+        arguments:
+            - "%kernel.project_dir%"
+            - "%kernel.root_dir%"
+            - "%kernel.cache_dir%"
+            - "%kernel.logs_dir%"
+
+    Adamski\Symfony\DirectoryBundle\Helper\DirectoryHelper:
+        alias: directory_bundle.helper.directory

@@ -310,6 +310,76 @@ class DirectoryHelper {
     }
 
     /**
+     * Copy provided file to new specified directory.
+     *
+     * @param string|File      $file
+     * @param string|Directory $directory
+     * @param bool             $overwrite
+     * @return bool
+     */
+    public function copyFile($file, $directory, bool $overwrite = false) {
+        $filePath = $file instanceof File ? $file->getRealPath() : $file;
+        $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
+
+        if (file_exists($filePath) && file_exists($directoryPath) && is_dir($directoryPath)) {
+            $file = $this->parseFromPath($filePath);
+
+            // Generate final file path
+            $fileFinalPath = $this->joinPath($directoryPath, $file->getName());
+
+            // Check if file with the same name do not exist in final path
+            // or if overwrite parameter is set to true
+            if (!file_exists($fileFinalPath) || (file_exists($fileFinalPath) && $overwrite)) {
+                return copy($filePath, $fileFinalPath);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Rename provided file with specified name.
+     *
+     * @param string|File $file
+     * @param string      $newName
+     * @return bool
+     */
+    public function renameFile($file, string $newName) {
+        $filePath = $file instanceof File ? $file->getRealPath() : $file;
+
+        if (file_exists($filePath)) {
+            $file = $this->parseFromPath($filePath);
+
+            // Generate final file path with new name
+            $fileFinalPath = $this->joinPath($file->getPath(), $newName . "." . $file->getExtension());
+
+            if (!file_exists($fileFinalPath)) {
+                return rename($filePath, $fileFinalPath);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Move provided file to new specified directory.
+     *
+     * @param string|File      $file
+     * @param string|Directory $directory
+     * @param bool             $overwrite
+     * @return bool
+     */
+    public function moveFile($file, $directory, bool $overwrite = false) {
+        $filePath = $file instanceof File ? $file->getRealPath() : $file;
+
+        if (true === $this->copyFile($file, $directory, $overwrite)) {
+            return $this->removeFile($filePath);
+        }
+
+        return false;
+    }
+
+    /**
      * Attempts to create the directory specified by pathname with provided mode.
      *
      * @param string $pathname
@@ -379,6 +449,47 @@ class DirectoryHelper {
             }
 
             return $responseStatus;
+        }
+
+        return false;
+    }
+
+    /**
+     * Rename provided directory with specified name.
+     *
+     * @param string|Directory $directory
+     * @param string           $newName
+     * @return bool
+     */
+    public function renameDirectory($directory, string $newName) {
+        $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
+
+        if (file_exists($directoryPath) && is_dir($directoryPath)) {
+            $directory = $this->parseFromPath($directoryPath);
+
+            // Generate final directory path with new name
+            $directoryFinalPath = $this->joinPath($directory->getPath(), $newName);
+
+            if (!file_exists($directoryFinalPath)) {
+                return rename($directoryPath, $directoryFinalPath);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Rename file or directory with specified name.
+     *
+     * @param string|File|Directory $item
+     * @param string                $newName
+     * @return bool
+     */
+    public function rename($item, string $newName) {
+        if ($item instanceof File || (file_exists($item) && !is_dir($item))) {
+            return $this->renameFile($item, $newName);
+        } else if ($item instanceof Directory || (file_exists($item) && is_dir($item))) {
+            return $this->renameDirectory($item, $newName);
         }
 
         return false;

@@ -2,9 +2,10 @@
 
 namespace Adamski\Symfony\DirectoryBundle\Model;
 
+use JsonSerializable;
 use SplFileInfo;
 
-class File {
+class File implements JsonSerializable {
 
     /**
      * @var string
@@ -260,6 +261,48 @@ class File {
      */
     public function setMimeType(?string $mimeType) {
         $this->mimeType = $mimeType;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNameWithoutExtension() {
+        if (null !== ($currentExtension = $this->getExtension())) {
+            if ("" !== $currentExtension) {
+                return str_replace("." . $currentExtension, "", $this->getName());
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash() {
+        return md5($this->getPathName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize() {
+        return [
+            "type"                 => "file",
+            "name"                 => $this->getName(),
+            "nameWithoutExtension" => $this->getNameWithoutExtension(),
+            "extension"            => $this->getExtension(),
+            "owner"                => $this->getOwner(),
+            "permissions"          => $this->getPermissions(),
+            "accessTime"           => $this->getAccessTime(),
+            "modificationTime"     => $this->getModificationTime(),
+            "changeTime"           => $this->getChangeTime(),
+            "isWritable"           => $this->isWritable(),
+            "isReadable"           => $this->isReadable(),
+            "size"                 => $this->getSize(),
+            "mimeType"             => $this->getMimeType(),
+            "hash"                 => $this->getHash()
+        ];
     }
 
     /**

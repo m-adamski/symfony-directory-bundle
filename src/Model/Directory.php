@@ -2,9 +2,10 @@
 
 namespace Adamski\Symfony\DirectoryBundle\Model;
 
+use JsonSerializable;
 use SplFileInfo;
 
-class Directory {
+class Directory implements JsonSerializable {
 
     /**
      * @var string
@@ -267,6 +268,35 @@ class Directory {
      */
     public function setSummarySize(int $summarySize) {
         $this->summarySize = $summarySize;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash() {
+        return md5($this->getPathName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize() {
+        return [
+            "type"               => "directory",
+            "name"               => $this->getName(),
+            "owner"              => $this->getOwner(),
+            "permissions"        => $this->getPermissions(),
+            "accessTime"         => $this->getAccessTime(),
+            "modificationTime"   => $this->getModificationTime(),
+            "changeTime"         => $this->getChangeTime(),
+            "isWritable"         => $this->isWritable(),
+            "isReadable"         => $this->isReadable(),
+            "directoriesCounter" => $this->getDirectoriesCounter(),
+            "filesCounter"       => $this->getFilesCounter(),
+            "summaryCounter"     => $this->getSummaryCounter(),
+            "summarySize"        => $this->getSummarySize(),
+            "hash"               => $this->getHash()
+        ];
     }
 
     /**

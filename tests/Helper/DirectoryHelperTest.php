@@ -3,6 +3,8 @@
 namespace Adamski\Symfony\DirectoryBundleTests\Helper;
 
 use Adamski\Symfony\DirectoryBundle\Helper\DirectoryHelper;
+use Adamski\Symfony\DirectoryBundle\Model\Directory;
+use Adamski\Symfony\DirectoryBundle\Model\File;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -18,15 +20,15 @@ class DirectoryHelperTest extends TestCase {
      */
     protected function setUp() {
         $this->directoryHelper = new DirectoryHelper(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "var" . DIRECTORY_SEPARATOR . "cache",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "var" . DIRECTORY_SEPARATOR . "logs"
+            $this->joinPath("structure"),
+            $this->joinPath("structure"),
+            $this->joinPath("structure", "var", "cache"),
+            $this->joinPath("structure", "var", "logs")
         );
 
         // Prepare structure
-        $pathOne = realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure";
-        $pathTwo = realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path" . DIRECTORY_SEPARATOR . "two";
+        $pathOne = $this->joinPath("structure");
+        $pathTwo = $this->joinPath("structure", "path", "two");
 
         mkdir($pathOne, 0775, true);
         mkdir($pathTwo, 0775, true);
@@ -42,7 +44,7 @@ class DirectoryHelperTest extends TestCase {
     protected function tearDown() {
         $fileSystem = new Filesystem();
         $fileSystem->remove(
-            realpath(__DIR__ . "/../../") . "/structure"
+            $this->joinPath("structure")
         );
     }
 
@@ -52,7 +54,7 @@ class DirectoryHelperTest extends TestCase {
     public function testJoinPath() {
         $pathOne = $this->directoryHelper->joinPath("one", "two", "three");
 
-        $this->assertEquals("one\\two\\three", $pathOne);
+        $this->assertEquals("one" . DIRECTORY_SEPARATOR . "two" . DIRECTORY_SEPARATOR . "three", $pathOne);
     }
 
     /**
@@ -60,19 +62,17 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testGetRecursiveList() {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path" . DIRECTORY_SEPARATOR . "two",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path" . DIRECTORY_SEPARATOR . "two" . DIRECTORY_SEPARATOR . "two.txt"
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path"),
+            $this->joinPath("structure", "path", "two"),
+            $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -80,17 +80,15 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testGetRecursiveListFilesOnly() {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure", DirectoryHelper::RECURSIVE_FILES_ONLY
+            $this->joinPath("structure"), DirectoryHelper::RECURSIVE_FILES_ONLY
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path" . DIRECTORY_SEPARATOR . "two" . DIRECTORY_SEPARATOR . "two.txt"
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -98,17 +96,15 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testGetRecursiveListDirectoriesOnly() {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure", DirectoryHelper::RECURSIVE_DIRECTORIES_ONLY
+            $this->joinPath("structure"), DirectoryHelper::RECURSIVE_DIRECTORIES_ONLY
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path" . DIRECTORY_SEPARATOR . "two"
+            $this->joinPath("structure", "path"),
+            $this->joinPath("structure", "path", "two")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -116,16 +112,14 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testGetDirectories() {
         $itemsCollection = $this->directoryHelper->getDirectories(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path"
+            $this->joinPath("structure", "path")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -133,16 +127,14 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testGetFiles() {
         $itemsCollection = $this->directoryHelper->getFiles(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt"
+            $this->joinPath("structure", "one.txt")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -150,12 +142,24 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testParseFromPath() {
         $currentFile = $this->directoryHelper->parseFromPath(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt"
+            $this->joinPath("structure", "one.txt")
+        );
+
+        $currentDirectory = $this->directoryHelper->parseFromPath(
+            $this->joinPath("structure")
+        );
+
+        $this->assertInstanceOf(File::class, $currentFile);
+        $this->assertInstanceOf(Directory::class, $currentDirectory);
+
+        $this->assertEquals(
+            $this->joinPath("structure", "one.txt"),
+            $currentFile->getPathName()
         );
 
         $this->assertEquals(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt",
-            $currentFile->getPathName()
+            $this->joinPath("structure"),
+            $currentDirectory->getPathName()
         );
     }
 
@@ -164,13 +168,14 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testWriteFile() {
         $this->directoryHelper->writeFile(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt",
+            $this->joinPath("structure", "one.txt"),
             "TEST ABC"
         );
 
         $this->assertEquals(
-            "TEST ABC", file_get_contents(
-                realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt"
+            "TEST ABC",
+            file_get_contents(
+                $this->joinPath("structure", "one.txt")
             )
         );
     }
@@ -180,16 +185,14 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testRemoveFile() {
         $this->directoryHelper->removeFile(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "one.txt"
+            $this->joinPath("structure", "one.txt")
         );
 
         $itemsCollection = $this->directoryHelper->getFiles(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
-        $this->assertEquals([], array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEmpty($itemsCollection);
     }
 
     /**
@@ -197,21 +200,19 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testCreateDirectory() {
         $this->directoryHelper->createDirectory(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "testabc"
+            $this->joinPath("structure", "test")
         );
 
         $itemsCollection = $this->directoryHelper->getDirectories(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
         $expectedCollection = [
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path",
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "testabc"
+            $this->joinPath("structure", "path"),
+            $this->joinPath("structure", "test")
         ];
 
-        $this->assertEquals($expectedCollection, array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
     /**
@@ -219,16 +220,14 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testRemoveDirectory() {
         $this->directoryHelper->removeDirectory(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path", true
+            $this->joinPath("structure", "path"), true
         );
 
         $itemsCollection = $this->directoryHelper->getDirectories(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure"
+            $this->joinPath("structure")
         );
 
-        $this->assertEquals([], array_map(function ($item) {
-            return $item->getPathName();
-        }, $itemsCollection));
+        $this->assertEmpty($itemsCollection);
     }
 
     /**
@@ -236,9 +235,116 @@ class DirectoryHelperTest extends TestCase {
      */
     public function testRemoveDirectoryAssertFalse() {
         $response = $this->directoryHelper->removeDirectory(
-            realpath(__DIR__ . "/../../") . DIRECTORY_SEPARATOR . "structure" . DIRECTORY_SEPARATOR . "path"
+            $this->joinPath("structure", "path")
         );
 
         $this->assertFalse($response);
+    }
+
+    /**
+     * Test of copyFile method.
+     */
+    public function testCopyFile() {
+        $this->directoryHelper->copyFile(
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path", "two")
+        );
+
+        $itemsCollection = $this->directoryHelper->getFiles(
+            $this->joinPath("structure", "path", "two")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path", "two", "one.txt"),
+            $this->joinPath("structure", "path", "two", "two.txt")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of renameFile method.
+     */
+    public function testRenameFile() {
+        $this->directoryHelper->renameFile(
+            $this->joinPath("structure", "one.txt"),
+            "test"
+        );
+
+        $itemsCollection = $this->directoryHelper->getFiles(
+            $this->joinPath("structure")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "test.txt")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of moveFile method.
+     */
+    public function testMoveFile() {
+        $this->directoryHelper->moveFile(
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path", "two")
+        );
+
+        $itemsCollection = $this->directoryHelper->getFiles(
+            $this->joinPath("structure")
+        );
+
+        $this->assertEmpty($itemsCollection);
+
+        $itemsCollection = $this->directoryHelper->getFiles(
+            $this->joinPath("structure", "path", "two")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path", "two", "one.txt"),
+            $this->joinPath("structure", "path", "two", "two.txt")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of renameDirectory method.
+     */
+    public function testRenameDirectory() {
+        $this->directoryHelper->renameDirectory(
+            $this->joinPath("structure", "path", "two"),
+            "three"
+        );
+
+        $itemsCollection = $this->directoryHelper->getDirectories(
+            $this->joinPath("structure", "path")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path", "three")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * @param string ...$args
+     * @return string
+     */
+    private function joinPath(string ...$args) {
+        return implode(DIRECTORY_SEPARATOR, array_merge([realpath(__DIR__ . "/../../")], $args));
+    }
+
+    /**
+     * @param array  $collection
+     * @param string $getter
+     * @return array
+     */
+    private function mapParameter(array $collection, string $getter = "getPathName") {
+        return array_map(function ($item) use ($getter) {
+            return $item->{$getter}();
+        }, $collection);
     }
 }

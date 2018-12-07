@@ -271,6 +271,34 @@ class Directory implements JsonSerializable {
     }
 
     /**
+     * @return string|null
+     */
+    public function getHumanSummarySize() {
+        $sizeCheck = [
+            0             => "B",
+            1024          => "kB",
+            1048576       => "MB",
+            1073741824    => "GB",
+            1099511627776 => "TB"
+        ];
+
+        // Get summary size
+        $summarySize = $this->getSummarySize();
+
+        // Reverse array
+        $sizeCheck = array_reverse($sizeCheck, true);
+
+        // Move every item backwards
+        foreach ($sizeCheck as $currentSize => $currentAbbreviation) {
+            if ($summarySize > $currentSize) {
+                return round($summarySize / $currentSize) . " " . $currentAbbreviation;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return string
      */
     public function getHash() {
@@ -295,6 +323,7 @@ class Directory implements JsonSerializable {
             "filesCounter"       => $this->getFilesCounter(),
             "summaryCounter"     => $this->getSummaryCounter(),
             "summarySize"        => $this->getSummarySize(),
+            "humanSummarySize"   => $this->getHumanSummarySize(),
             "hash"               => $this->getHash()
         ];
     }

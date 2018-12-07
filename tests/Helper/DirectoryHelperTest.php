@@ -330,6 +330,68 @@ class DirectoryHelperTest extends TestCase {
     }
 
     /**
+     * Test of findFilesByRegex method.
+     */
+    public function testFindFilesByRegex() {
+        $itemsCollection = $this->directoryHelper->findFilesByRegex(
+            $this->joinPath("structure"),
+            "/^one/",
+            "name"
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "one.txt")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of findOneFileByPattern method.
+     */
+    public function testFindOneFileByPattern() {
+        $resultItem = $this->directoryHelper->findOneFileByPattern(
+            $this->joinPath("structure"),
+            "/^one/",
+            "name"
+        );
+
+        $this->assertInstanceOf(File::class, $resultItem);
+        $this->assertEquals($this->joinPath("structure", "one.txt"), $resultItem->getPathName());
+    }
+
+    /**
+     * Test of findDirectoriesByPattern method.
+     */
+    public function testFindDirectoriesByPattern() {
+        $itemsCollection = $this->directoryHelper->findDirectoriesByPattern(
+            $this->joinPath("structure"),
+            "/^two/",
+            "name"
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path", "two")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of findOneDirectoryByPattern method.
+     */
+    public function testFindOneDirectoryByPattern() {
+        $resultItem = $this->directoryHelper->findOneDirectoryByPattern(
+            $this->joinPath("structure"),
+            "/^two/",
+            "name"
+        );
+
+        $this->assertInstanceOf(Directory::class, $resultItem);
+        $this->assertEquals($this->joinPath("structure", "path", "two"), $resultItem->getPathName());
+    }
+
+    /**
      * @param string ...$args
      * @return string
      */

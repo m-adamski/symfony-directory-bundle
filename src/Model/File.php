@@ -252,6 +252,34 @@ class File implements JsonSerializable {
     /**
      * @return string|null
      */
+    public function getHumanSize() {
+        $sizeCheck = [
+            0             => "B",
+            1024          => "kB",
+            1048576       => "MB",
+            1073741824    => "GB",
+            1099511627776 => "TB"
+        ];
+
+        // Get summary size
+        $summarySize = $this->getSize();
+
+        // Reverse array
+        $sizeCheck = array_reverse($sizeCheck, true);
+
+        // Move every item backwards
+        foreach ($sizeCheck as $currentSize => $currentAbbreviation) {
+            if ($summarySize > $currentSize) {
+                return round($summarySize / $currentSize) . " " . $currentAbbreviation;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getMimeType() {
         return $this->mimeType;
     }
@@ -300,6 +328,7 @@ class File implements JsonSerializable {
             "isWritable"           => $this->isWritable(),
             "isReadable"           => $this->isReadable(),
             "size"                 => $this->getSize(),
+            "humanSize"            => $this->getHumanSize(),
             "mimeType"             => $this->getMimeType(),
             "hash"                 => $this->getHash()
         ];

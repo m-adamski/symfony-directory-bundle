@@ -158,16 +158,19 @@ class DirectoryHelper {
     /**
      * Get collection with directories from specified path.
      *
-     * @param string $path
+     * @param string|Directory $directory
      * @return Directory[]
      */
-    public function getDirectories(string $path) {
+    public function getDirectories($directory) {
+        if ($directory instanceof Directory) {
+            $directory = $directory->getRealPath();
+        }
 
         // Define array with directories to response
         $responseDirectories = [];
 
         // Define iterator
-        $directoryIterator = new DirectoryIterator($path);
+        $directoryIterator = new DirectoryIterator($directory);
 
         foreach ($directoryIterator as $currentItem) {
             if ($currentItem->isDir() && !$currentItem->isDot()) {
@@ -380,6 +383,69 @@ class DirectoryHelper {
     }
 
     /**
+     * Find files which specified parameter matching provided pattern.
+     *
+     * @param string|Directory $directory
+     * @param string           $pattern
+     * @param string           $param
+     * @return array|null
+     * @throws Exception
+     */
+    public function findFilesByRegex($directory, string $pattern, string $param = "name") {
+        $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
+
+        if (file_exists($directoryPath) && is_dir($directoryPath)) {
+            $directory = $this->parseFromPath($directoryPath);
+
+            // Define collection of matching files
+            $responseCollection = [];
+
+            // Find file which parameter matching specified pattern
+            foreach ($this->getFiles($directory) as $currentFile) {
+                if (method_exists($currentFile, "get" . $param)) {
+                    if (true === (bool)preg_match($pattern, $currentFile->{"get" . $param}())) {
+                        $responseCollection[] = $currentFile;
+                    }
+                } else {
+                    throw new Exception("The file object has no function defined to retrieve the value of '" . $param . "' parameter");
+                }
+            }
+
+            // Move recursive
+            foreach ($this->getDirectories($directory) as $currentDirectory) {
+                if (null !== ($recursiveResponse = $this->findFilesByRegex($currentDirectory, $pattern, $param))) {
+                    $responseCollection = array_merge($responseCollection, $recursiveResponse);
+                }
+            }
+
+            // Return collection
+            return $responseCollection;
+        }
+
+        return null;
+    }
+
+    /**
+     * Find one file which specified parameter matching provided pattern.
+     * The function will return null if more than one matching object is found.
+     *
+     * @param string|Directory $directory
+     * @param string           $pattern
+     * @param string           $param
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function findOneFileByPattern($directory, string $pattern, string $param = "name") {
+        $matchingCollection = $this->findFilesByRegex($directory, $pattern, $param);
+
+        if (is_array($matchingCollection) && count($matchingCollection) === 1) {
+            return $matchingCollection[0];
+        }
+
+        return null;
+    }
+
+    /**
      * Attempts to create the directory specified by pathname with provided mode.
      *
      * @param string $pathname
@@ -476,6 +542,69 @@ class DirectoryHelper {
         }
 
         return false;
+    }
+
+    /**
+     * Find directories which specified parameter matching provided pattern.
+     *
+     * @param string|Directory $directory
+     * @param string           $pattern
+     * @param string           $param
+     * @return array|null
+     * @throws Exception
+     */
+    public function findDirectoriesByPattern($directory, string $pattern, string $param = "name") {
+        $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
+
+        if (file_exists($directoryPath) && is_dir($directoryPath)) {
+            $directory = $this->parseFromPath($directoryPath);
+
+            // Define collection of matching directories
+            $responseCollection = [];
+
+            // Check if exist directory in current path matching specified conditions
+            foreach ($this->getDirectories($directory) as $currentDirectory) {
+                if (method_exists($currentDirectory, "get" . $param)) {
+                    if (true === (bool)preg_match($pattern, $currentDirectory->{"get" . $param}())) {
+                        $responseCollection[] = $currentDirectory;
+                    }
+                } else {
+                    throw new Exception("The directory object has no function defined to retrieve the value of '" . $param . "' parameter");
+                }
+            }
+
+            // Move recursive to find matching directory
+            foreach ($this->getDirectories($directory) as $currentDirectory) {
+                if (null !== ($recursiveResponse = $this->findDirectoriesByPattern($currentDirectory, $pattern, $param))) {
+                    $responseCollection = array_merge($responseCollection, $recursiveResponse);
+                }
+            }
+
+            // Return collection
+            return $responseCollection;
+        }
+
+        return null;
+    }
+
+    /**
+     * Find one directory which specified parameter matching provided pattern.
+     * The function will return null if more than one matching object is found.
+     *
+     * @param string|Directory $directory
+     * @param string           $pattern
+     * @param string           $param
+     * @return mixed|null
+     * @throws Exception
+     */
+    public function findOneDirectoryByPattern($directory, string $pattern, string $param = "name") {
+        $matchingCollection = $this->findDirectoriesByPattern($directory, $pattern, $param);
+
+        if (is_array($matchingCollection) && count($matchingCollection) === 1) {
+            return $matchingCollection[0];
+        }
+
+        return null;
     }
 
     /**

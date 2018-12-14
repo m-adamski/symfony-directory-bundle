@@ -275,7 +275,7 @@ class Directory implements JsonSerializable {
      */
     public function getHumanSummarySize() {
         $sizeCheck = [
-            0             => "B",
+            1             => "B",
             1024          => "kB",
             1048576       => "MB",
             1073741824    => "GB",

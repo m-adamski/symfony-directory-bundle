@@ -18,6 +18,16 @@ class File implements JsonSerializable {
     protected $path;
 
     /**
+     * @var string|null
+     */
+    protected $basePath;
+
+    /**
+     * @var string|null
+     */
+    protected $baseHost;
+
+    /**
      * @var string
      */
     protected $pathName;
@@ -73,6 +83,15 @@ class File implements JsonSerializable {
     protected $mimeType;
 
     /**
+     * File constructor.
+     */
+    public function __construct() {
+        $this->basePath = null;
+        $this->baseHost = null;
+        $this->mimeType = null;
+    }
+
+    /**
      * @return string
      */
     public function getName() {
@@ -101,6 +120,34 @@ class File implements JsonSerializable {
     }
 
     /**
+     * @return string|null
+     */
+    public function getBasePath() {
+        return $this->basePath;
+    }
+
+    /**
+     * @param string|null $basePath
+     */
+    public function setBasePath(?string $basePath) {
+        $this->basePath = $basePath;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBaseHost() {
+        return $this->baseHost;
+    }
+
+    /**
+     * @param string|null $baseHost
+     */
+    public function setBaseHost(?string $baseHost) {
+        $this->baseHost = $baseHost;
+    }
+
+    /**
      * @return string
      */
     public function getPathName() {
@@ -121,6 +168,19 @@ class File implements JsonSerializable {
         return realpath(
             $this->getPathName()
         );
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRelativePath() {
+        if (null !== ($basePath = $this->getBasePath())) {
+            if (false !== ($realPath = $this->getRealPath())) {
+                return preg_replace("/^" . preg_quote($basePath, "/") . "/", "", $realPath);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -254,7 +314,7 @@ class File implements JsonSerializable {
      */
     public function getHumanSize() {
         $sizeCheck = [
-            0             => "B",
+            1             => "B",
             1024          => "kB",
             1048576       => "MB",
             1073741824    => "GB",
@@ -297,7 +357,20 @@ class File implements JsonSerializable {
     public function getNameWithoutExtension() {
         if (null !== ($currentExtension = $this->getExtension())) {
             if ("" !== $currentExtension) {
-                return str_replace("." . $currentExtension, "", $this->getName());
+                return preg_replace("/" . preg_quote("." . $currentExtension, "/") . "$/", "", $this->getName());
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUrl() {
+        if (null !== ($baseHost = $this->getBaseHost())) {
+            if (null !== ($relativePath = $this->getRelativePath())) {
+                return rtrim($this->getBaseHost(), "/") . "/" . ltrim(str_replace("\\", "/", $this->getRelativePath()), "/");
             }
         }
 
@@ -320,6 +393,7 @@ class File implements JsonSerializable {
             "name"                 => $this->getName(),
             "nameWithoutExtension" => $this->getNameWithoutExtension(),
             "extension"            => $this->getExtension(),
+            "relativePath"         => $this->getRelativePath(),
             "owner"                => $this->getOwner(),
             "permissions"          => $this->getPermissions(),
             "accessTime"           => $this->getAccessTime(),
@@ -330,18 +404,23 @@ class File implements JsonSerializable {
             "size"                 => $this->getSize(),
             "humanSize"            => $this->getHumanSize(),
             "mimeType"             => $this->getMimeType(),
-            "hash"                 => $this->getHash()
+            "hash"                 => $this->getHash(),
+            "url"                  => $this->getUrl()
         ];
     }
 
     /**
      * @param SplFileInfo $fileInfo
+     * @param string|null $baseDirectory
+     * @param string|null $baseHost
      * @return File
      */
-    public static function parse(SplFileInfo $fileInfo) {
+    public static function parse(SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null) {
         $currentFile = new File();
         $currentFile->setName($fileInfo->getFilename());
         $currentFile->setPath($fileInfo->getPath());
+        $currentFile->setBasePath($baseDirectory);
+        $currentFile->setBaseHost($baseHost);
         $currentFile->setPathName($fileInfo->getPathname());
         $currentFile->setExtension($fileInfo->getExtension());
         $currentFile->setOwner($fileInfo->getOwner());

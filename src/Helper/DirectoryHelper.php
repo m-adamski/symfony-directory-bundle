@@ -186,12 +186,18 @@ class DirectoryHelper {
     /**
      * Get collection with files stored in provided directory.
      *
-     * @param string|Directory $directory
+     * @param string|Directory      $directory
+     * @param string|Directory|null $baseDirectory
+     * @param string|null           $baseHost
      * @return File[]
      */
-    public function getFiles($directory) {
+    public function getFiles($directory, $baseDirectory = null, ?string $baseHost = null) {
         if ($directory instanceof Directory) {
             $directory = $directory->getRealPath();
+        }
+
+        if (null !== $baseDirectory && $baseDirectory instanceof Directory) {
+            $baseDirectory = $baseDirectory->getRealPath();
         }
 
         // Define array with files to response
@@ -202,7 +208,7 @@ class DirectoryHelper {
 
         foreach ($directoryIterator as $currentItem) {
             if ($currentItem->isFile() && !$currentItem->isDot()) {
-                if (null !== ($currentFile = $this->parse($currentItem))) {
+                if (null !== ($currentFile = $this->parse($currentItem, $baseDirectory, $baseHost))) {
                     $responseFiles[] = $currentFile;
                 }
             }
@@ -231,9 +237,11 @@ class DirectoryHelper {
      * Parse provided item into matching object.
      *
      * @param SplFileInfo $fileInfo
+     * @param string|null $baseDirectory
+     * @param string|null $baseHost
      * @return Directory|File|null
      */
-    public function parse(SplFileInfo $fileInfo) {
+    public function parse(SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null) {
         if ($fileInfo->isDir()) {
             $currentDirectory = Directory::parse($fileInfo);
 
@@ -257,7 +265,7 @@ class DirectoryHelper {
 
             return $currentDirectory;
         } else if ($fileInfo->isFile()) {
-            return File::parse($fileInfo);
+            return File::parse($fileInfo, $baseDirectory, $baseHost);
         }
 
         return null;
@@ -266,13 +274,14 @@ class DirectoryHelper {
     /**
      * Parse item from specified path into matching object.
      *
-     * @param string $path
+     * @param string      $path
+     * @param string|null $baseDirectory
      * @return Directory|File|null
      */
-    public function parseFromPath(string $path) {
+    public function parseFromPath(string $path, ?string $baseDirectory = null) {
         if (file_exists($path)) {
             return $this->parse(
-                new SplFileInfo($path)
+                new SplFileInfo($path), $baseDirectory
             );
         }
 
@@ -451,15 +460,15 @@ class DirectoryHelper {
      * @param string $pathname
      * @param int    $mode
      * @param bool   $recursive
-     * @return string|null
+     * @return bool|null
      */
     public function createDirectory(string $pathname, int $mode = 0775, bool $recursive = true) {
         try {
             if (!file_exists($pathname)) {
-                mkdir($pathname, $mode, $recursive);
+                return mkdir($pathname, $mode, $recursive);
             }
 
-            return $pathname;
+            return false;
         } catch (Exception $exception) {
             return null;
         }

@@ -58,6 +58,14 @@ class DirectoryHelperTest extends TestCase {
     }
 
     /**
+     * Test of joinName method.
+     */
+    public function testJoinName() {
+        $this->assertEquals("hello_world.txt", $this->directoryHelper->joinName("txt", "hello", "_", "world"));
+        $this->assertEquals("hello_world", $this->directoryHelper->joinName(null, "hello", "_", "world"));
+    }
+
+    /**
      * Test of getRecursiveList method.
      */
     public function testGetRecursiveList() {
@@ -250,12 +258,27 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "two")
         );
 
+        $this->directoryHelper->copyFile(
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path", "two")
+        );
+
+        $this->directoryHelper->copyFile(
+            $this->joinPath("structure", "one.txt"),
+            $this->joinPath("structure", "path", "two"),
+            false,
+            true,
+            "_aax"
+        );
+
         $itemsCollection = $this->directoryHelper->getFiles(
             $this->joinPath("structure", "path", "two")
         );
 
         $expectedCollection = [
             $this->joinPath("structure", "path", "two", "one.txt"),
+            $this->joinPath("structure", "path", "two", "one_aax.txt"),
+            $this->joinPath("structure", "path", "two", "one_copy.txt"),
             $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
@@ -389,6 +412,64 @@ class DirectoryHelperTest extends TestCase {
 
         $this->assertInstanceOf(Directory::class, $resultItem);
         $this->assertEquals($this->joinPath("structure", "path", "two"), $resultItem->getPathName());
+    }
+
+    /**
+     * Test of copyDirectory method.
+     */
+    public function testCopyDirectory() {
+        $this->directoryHelper->copyDirectory(
+            $this->joinPath("structure", "path", "two"),
+            $this->joinPath("structure")
+        );
+
+        $this->directoryHelper->copyDirectory(
+            $this->joinPath("structure", "path", "two"),
+            $this->joinPath("structure")
+        );
+
+        $this->directoryHelper->copyDirectory(
+            $this->joinPath("structure", "path", "two"),
+            $this->joinPath("structure"),
+            false,
+            true,
+            "_aax"
+        );
+
+        $itemsCollection = $this->directoryHelper->getDirectories(
+            $this->joinPath("structure")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path"),
+            $this->joinPath("structure", "two"),
+            $this->joinPath("structure", "two_aax"),
+            $this->joinPath("structure", "two_copy")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+    }
+
+    /**
+     * Test of moveDirectory method.
+     */
+    public function testMoveDirectory() {
+        $this->directoryHelper->moveDirectory(
+            $this->joinPath("structure", "path", "two"),
+            $this->joinPath("structure")
+        );
+
+        $itemsCollection = $this->directoryHelper->getDirectories(
+            $this->joinPath("structure")
+        );
+
+        $expectedCollection = [
+            $this->joinPath("structure", "path"),
+            $this->joinPath("structure", "two")
+        ];
+
+        $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
+        $this->assertEmpty( $this->directoryHelper->getDirectories($this->joinPath("structure", "path")));
     }
 
     /**

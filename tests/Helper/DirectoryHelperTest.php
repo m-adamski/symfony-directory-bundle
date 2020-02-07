@@ -18,7 +18,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * {@inheritdoc}
      */
-    protected function setUp() {
+    protected function setUp(): void {
         $this->directoryHelper = new DirectoryHelper(
             $this->joinPath("structure"),
             $this->joinPath("structure"),
@@ -41,7 +41,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * {@inheritdoc}
      */
-    protected function tearDown() {
+    protected function tearDown(): void {
         $fileSystem = new Filesystem();
         $fileSystem->remove(
             $this->joinPath("structure")
@@ -51,7 +51,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of joinPath method.
      */
-    public function testJoinPath() {
+    public function testJoinPath(): void {
         $pathOne = $this->directoryHelper->joinPath("one", "two", "three");
 
         $this->assertEquals("one" . DIRECTORY_SEPARATOR . "two" . DIRECTORY_SEPARATOR . "three", $pathOne);
@@ -60,7 +60,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of joinName method.
      */
-    public function testJoinName() {
+    public function testJoinName(): void {
         $this->assertEquals("hello_world.txt", $this->directoryHelper->joinName("txt", "hello", "_", "world"));
         $this->assertEquals("hello_world", $this->directoryHelper->joinName(null, "hello", "_", "world"));
     }
@@ -68,7 +68,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of getRecursiveList method.
      */
-    public function testGetRecursiveList() {
+    public function testGetRecursiveList(): void {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
             $this->joinPath("structure")
         );
@@ -86,7 +86,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of getRecursiveList method.
      */
-    public function testGetRecursiveListFilesOnly() {
+    public function testGetRecursiveListFilesOnly(): void {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
             $this->joinPath("structure"), DirectoryHelper::RECURSIVE_FILES_ONLY
         );
@@ -102,7 +102,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of getRecursiveList method.
      */
-    public function testGetRecursiveListDirectoriesOnly() {
+    public function testGetRecursiveListDirectoriesOnly(): void {
         $itemsCollection = $this->directoryHelper->getRecursiveList(
             $this->joinPath("structure"), DirectoryHelper::RECURSIVE_DIRECTORIES_ONLY
         );
@@ -118,7 +118,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of getDirectories method.
      */
-    public function testGetDirectories() {
+    public function testGetDirectories(): void {
         $itemsCollection = $this->directoryHelper->getDirectories(
             $this->joinPath("structure")
         );
@@ -133,7 +133,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of getFiles method.
      */
-    public function testGetFiles() {
+    public function testGetFiles(): void {
         $itemsCollection = $this->directoryHelper->getFiles(
             $this->joinPath("structure")
         );
@@ -148,7 +148,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of parseFromPath method.
      */
-    public function testParseFromPath() {
+    public function testParseFromPath(): void {
         $currentFile = $this->directoryHelper->parseFromPath(
             $this->joinPath("structure", "one.txt")
         );
@@ -174,7 +174,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of writeFile method.
      */
-    public function testWriteFile() {
+    public function testWriteFile(): void {
         $this->directoryHelper->writeFile(
             $this->joinPath("structure", "one.txt"),
             "TEST ABC"
@@ -191,7 +191,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of removeFile method.
      */
-    public function testRemoveFile() {
+    public function testRemoveFile(): void {
         $this->directoryHelper->removeFile(
             $this->joinPath("structure", "one.txt")
         );
@@ -206,7 +206,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of createDirectory method.
      */
-    public function testCreateDirectory() {
+    public function testCreateDirectory(): void {
         $this->directoryHelper->createDirectory(
             $this->joinPath("structure", "test")
         );
@@ -226,7 +226,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of removeDirectory method.
      */
-    public function testRemoveDirectory() {
+    public function testRemoveDirectory(): void {
         $this->directoryHelper->removeDirectory(
             $this->joinPath("structure", "path"), true
         );
@@ -241,7 +241,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of removeDirectory method.
      */
-    public function testRemoveDirectoryAssertFalse() {
+    public function testRemoveDirectoryAssertFalse(): void {
         $response = $this->directoryHelper->removeDirectory(
             $this->joinPath("structure", "path")
         );
@@ -252,7 +252,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of copyFile method.
      */
-    public function testCopyFile() {
+    public function testCopyFile(): void {
         $this->directoryHelper->copyFile(
             $this->joinPath("structure", "one.txt"),
             $this->joinPath("structure", "path", "two")
@@ -288,7 +288,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of renameFile method.
      */
-    public function testRenameFile() {
+    public function testRenameFile(): void {
         $this->directoryHelper->renameFile(
             $this->joinPath("structure", "one.txt"),
             "test"
@@ -308,7 +308,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of moveFile method.
      */
-    public function testMoveFile() {
+    public function testMoveFile(): void {
         $this->directoryHelper->moveFile(
             $this->joinPath("structure", "one.txt"),
             $this->joinPath("structure", "path", "two")
@@ -335,7 +335,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of renameDirectory method.
      */
-    public function testRenameDirectory() {
+    public function testRenameDirectory(): void {
         $this->directoryHelper->renameDirectory(
             $this->joinPath("structure", "path", "two"),
             "three"
@@ -355,7 +355,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of findFilesByRegex method.
      */
-    public function testFindFilesByRegex() {
+    public function testFindFilesByRegex(): void {
         $itemsCollection = $this->directoryHelper->findFilesByRegex(
             $this->joinPath("structure"),
             "/^one/",
@@ -372,7 +372,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of findOneFileByPattern method.
      */
-    public function testFindOneFileByPattern() {
+    public function testFindOneFileByPattern(): void {
         $resultItem = $this->directoryHelper->findOneFileByPattern(
             $this->joinPath("structure"),
             "/^one/",
@@ -386,7 +386,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of findDirectoriesByPattern method.
      */
-    public function testFindDirectoriesByPattern() {
+    public function testFindDirectoriesByPattern(): void {
         $itemsCollection = $this->directoryHelper->findDirectoriesByPattern(
             $this->joinPath("structure"),
             "/^two/",
@@ -403,7 +403,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of findOneDirectoryByPattern method.
      */
-    public function testFindOneDirectoryByPattern() {
+    public function testFindOneDirectoryByPattern(): void {
         $resultItem = $this->directoryHelper->findOneDirectoryByPattern(
             $this->joinPath("structure"),
             "/^two/",
@@ -417,7 +417,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of copyDirectory method.
      */
-    public function testCopyDirectory() {
+    public function testCopyDirectory(): void {
         $this->directoryHelper->copyDirectory(
             $this->joinPath("structure", "path", "two"),
             $this->joinPath("structure")
@@ -453,7 +453,7 @@ class DirectoryHelperTest extends TestCase {
     /**
      * Test of moveDirectory method.
      */
-    public function testMoveDirectory() {
+    public function testMoveDirectory(): void {
         $this->directoryHelper->moveDirectory(
             $this->joinPath("structure", "path", "two"),
             $this->joinPath("structure")
@@ -469,14 +469,14 @@ class DirectoryHelperTest extends TestCase {
         ];
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
-        $this->assertEmpty( $this->directoryHelper->getDirectories($this->joinPath("structure", "path")));
+        $this->assertEmpty($this->directoryHelper->getDirectories($this->joinPath("structure", "path")));
     }
 
     /**
      * @param string ...$args
      * @return string
      */
-    private function joinPath(string ...$args) {
+    private function joinPath(string ...$args): string {
         return implode(DIRECTORY_SEPARATOR, array_merge([realpath(__DIR__ . "/../../")], $args));
     }
 
@@ -485,7 +485,7 @@ class DirectoryHelperTest extends TestCase {
      * @param string $getter
      * @return array
      */
-    private function mapParameter(array $collection, string $getter = "getPathName") {
+    private function mapParameter(array $collection, string $getter = "getPathName"): array {
         return array_map(function ($item) use ($getter) {
             return $item->{$getter}();
         }, $collection);

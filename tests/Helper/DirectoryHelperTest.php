@@ -80,6 +80,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -95,6 +97,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "one.txt"),
             $this->joinPath("structure", "path", "two", "two.txt")
         ];
+
+        sort($expectedCollection);
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
@@ -112,6 +116,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "two")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -127,6 +133,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -141,6 +149,8 @@ class DirectoryHelperTest extends TestCase {
         $expectedCollection = [
             $this->joinPath("structure", "one.txt")
         ];
+
+        sort($expectedCollection);
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
@@ -220,6 +230,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "test")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -282,6 +294,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -301,6 +315,8 @@ class DirectoryHelperTest extends TestCase {
         $expectedCollection = [
             $this->joinPath("structure", "test.txt")
         ];
+
+        sort($expectedCollection);
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
@@ -329,6 +345,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "two", "two.txt")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -349,6 +367,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "path", "three")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -365,6 +385,8 @@ class DirectoryHelperTest extends TestCase {
         $expectedCollection = [
             $this->joinPath("structure", "one.txt")
         ];
+
+        sort($expectedCollection);
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
@@ -396,6 +418,8 @@ class DirectoryHelperTest extends TestCase {
         $expectedCollection = [
             $this->joinPath("structure", "path", "two")
         ];
+
+        sort($expectedCollection);
 
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
@@ -447,6 +471,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "two_copy")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
     }
 
@@ -468,6 +494,8 @@ class DirectoryHelperTest extends TestCase {
             $this->joinPath("structure", "two")
         ];
 
+        sort($expectedCollection);
+
         $this->assertEquals($expectedCollection, $this->mapParameter($itemsCollection));
         $this->assertEmpty($this->directoryHelper->getDirectories($this->joinPath("structure", "path")));
     }
@@ -486,8 +514,12 @@ class DirectoryHelperTest extends TestCase {
      * @return array
      */
     private function mapParameter(array $collection, string $getter = "getPathName"): array {
-        return array_map(function ($item) use ($getter) {
+        $responseArray = array_map(function ($item) use ($getter) {
             return $item->{$getter}();
         }, $collection);
+
+        sort($responseArray);
+
+        return $responseArray;
     }
 }

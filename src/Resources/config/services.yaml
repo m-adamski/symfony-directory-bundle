@@ -3,7 +3,6 @@ services:
         class: Adamski\Symfony\DirectoryBundle\Helper\DirectoryHelper
         arguments:
             - "%kernel.project_dir%"
-            - "%kernel.root_dir%"
             - "%kernel.cache_dir%"
             - "%kernel.logs_dir%"
 

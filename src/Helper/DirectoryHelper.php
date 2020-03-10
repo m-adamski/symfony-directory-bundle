@@ -24,11 +24,6 @@ class DirectoryHelper {
     /**
      * @var string
      */
-    protected $sourceDirectory;
-
-    /**
-     * @var string
-     */
     protected $cacheDirectory;
 
     /**
@@ -50,13 +45,11 @@ class DirectoryHelper {
      * DirectoryHelper constructor.
      *
      * @param string $projectDir
-     * @param string $rootDir
      * @param string $cacheDir
      * @param string $logsDir
      */
-    public function __construct(string $projectDir, string $rootDir, string $cacheDir, string $logsDir) {
+    public function __construct(string $projectDir, string $cacheDir, string $logsDir) {
         $this->projectDirectory = $projectDir;
-        $this->sourceDirectory = $rootDir;
         $this->cacheDirectory = $cacheDir;
         $this->logsDirectory = $logsDir;
         $this->publicDirectory = $this->projectDirectory . DIRECTORY_SEPARATOR . $this->publicDirectoryName;
@@ -69,15 +62,6 @@ class DirectoryHelper {
      */
     public function getProjectDirectory() {
         return $this->projectDirectory;
-    }
-
-    /**
-     * Get Kernel Source directory.
-     *
-     * @return string
-     */
-    public function getSourceDirectory() {
-        return $this->sourceDirectory;
     }
 
     /**

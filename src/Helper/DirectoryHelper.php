@@ -5,10 +5,8 @@ namespace Adamski\Symfony\DirectoryBundle\Helper;
 use Adamski\Symfony\DirectoryBundle\Model\Directory;
 use Adamski\Symfony\DirectoryBundle\Model\File;
 use DirectoryIterator;
-use Exception;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use SplFileInfo;
 
 class DirectoryHelper {
 
@@ -16,42 +14,14 @@ class DirectoryHelper {
     const RECURSIVE_FILES_ONLY = 1;
     const RECURSIVE_DIRECTORIES_ONLY = 2;
 
-    /**
-     * @var string
-     */
-    protected $projectDirectory;
+    protected string $publicDirectory;
+    protected string $publicDirectoryName = "public";
 
-    /**
-     * @var string
-     */
-    protected $cacheDirectory;
-
-    /**
-     * @var string
-     */
-    protected $logsDirectory;
-
-    /**
-     * @var string
-     */
-    protected $publicDirectory;
-
-    /**
-     * @var string
-     */
-    protected $publicDirectoryName = "public";
-
-    /**
-     * DirectoryHelper constructor.
-     *
-     * @param string $projectDir
-     * @param string $cacheDir
-     * @param string $logsDir
-     */
-    public function __construct(string $projectDir, string $cacheDir, string $logsDir) {
-        $this->projectDirectory = $projectDir;
-        $this->cacheDirectory = $cacheDir;
-        $this->logsDirectory = $logsDir;
+    public function __construct(
+        private readonly string $projectDirectory,
+        private readonly string $cacheDirectory,
+        private readonly string $logsDirectory
+    ) {
         $this->publicDirectory = $this->projectDirectory . DIRECTORY_SEPARATOR . $this->publicDirectoryName;
     }
 
@@ -60,7 +30,7 @@ class DirectoryHelper {
      *
      * @return string
      */
-    public function getProjectDirectory() {
+    public function getProjectDirectory(): string {
         return $this->projectDirectory;
     }
 
@@ -69,7 +39,7 @@ class DirectoryHelper {
      *
      * @return string
      */
-    public function getCacheDirectory() {
+    public function getCacheDirectory(): string {
         return $this->cacheDirectory;
     }
 
@@ -78,14 +48,14 @@ class DirectoryHelper {
      *
      * @return string
      */
-    public function getLogsDirectory() {
+    public function getLogsDirectory(): string {
         return $this->logsDirectory;
     }
 
     /**
      * @return string
      */
-    public function getPublicDirectory() {
+    public function getPublicDirectory(): string {
         return $this->publicDirectory;
     }
 
@@ -95,7 +65,7 @@ class DirectoryHelper {
      * @param string ...$items
      * @return string
      */
-    public function joinPath(string ...$items) {
+    public function joinPath(string ...$items): string {
         return implode(DIRECTORY_SEPARATOR, $items);
     }
 
@@ -106,7 +76,7 @@ class DirectoryHelper {
      * @param string      ...$items
      * @return string
      */
-    public function joinName(?string $extension, string ...$items) {
+    public function joinName(?string $extension, string ...$items): string {
         $responseName = implode("", $items);
 
         return null !== $extension && "" !== $extension ? $responseName . "." . $extension : $responseName;
@@ -120,7 +90,7 @@ class DirectoryHelper {
      * @param int              $mode
      * @return array
      */
-    public function getRecursiveList($directory, int $mode = self::RECURSIVE_ALL) {
+    public function getRecursiveList(Directory|string $directory, int $mode = self::RECURSIVE_ALL): array {
         if ($directory instanceof Directory) {
             $directory = $directory->getRealPath();
         }
@@ -158,7 +128,7 @@ class DirectoryHelper {
      * @param string|Directory $directory
      * @return Directory[]
      */
-    public function getDirectories($directory) {
+    public function getDirectories(Directory|string $directory): array {
         if ($directory instanceof Directory) {
             $directory = $directory->getRealPath();
         }
@@ -188,7 +158,7 @@ class DirectoryHelper {
      * @param string|null           $baseHost
      * @return File[]
      */
-    public function getFiles($directory, $baseDirectory = null, ?string $baseHost = null) {
+    public function getFiles(Directory|string $directory, Directory|string $baseDirectory = null, ?string $baseHost = null): array {
         if ($directory instanceof Directory) {
             $directory = $directory->getRealPath();
         }
@@ -222,7 +192,7 @@ class DirectoryHelper {
      * @param string $prefix
      * @return bool|string
      */
-    public function createTemporaryFile(string $directoryPath, string $prefix) {
+    public function createTemporaryFile(string $directoryPath, string $prefix): bool|string {
         if (file_exists($directoryPath) && is_dir($directoryPath)) {
             return tempnam($directoryPath, $prefix);
         }
@@ -233,12 +203,12 @@ class DirectoryHelper {
     /**
      * Parse provided item into matching object.
      *
-     * @param SplFileInfo $fileInfo
-     * @param string|null $baseDirectory
-     * @param string|null $baseHost
+     * @param \SplFileInfo $fileInfo
+     * @param string|null  $baseDirectory
+     * @param string|null  $baseHost
      * @return Directory|File|null
      */
-    public function parse(SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null) {
+    public function parse(\SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null): Directory|File|null {
         if ($fileInfo->isDir()) {
             $currentDirectory = Directory::parse($fileInfo);
 
@@ -275,10 +245,10 @@ class DirectoryHelper {
      * @param string|null $baseDirectory
      * @return Directory|File|null
      */
-    public function parseFromPath(string $path, ?string $baseDirectory = null) {
+    public function parseFromPath(string $path, ?string $baseDirectory = null): Directory|File|null {
         if (file_exists($path)) {
             return $this->parse(
-                new SplFileInfo($path), $baseDirectory
+                new \SplFileInfo($path), $baseDirectory
             );
         }
 
@@ -292,7 +262,7 @@ class DirectoryHelper {
      * @param string      $content
      * @return bool
      */
-    public function writeFile($file, string $content) {
+    public function writeFile(File|string $file, string $content): bool {
         if ($file instanceof File) {
             $file = $file->getRealPath();
         }
@@ -306,7 +276,7 @@ class DirectoryHelper {
      * @param string|File $file
      * @return bool
      */
-    public function removeFile($file) {
+    public function removeFile(File|string $file): bool {
         if ($file instanceof File) {
             $file = $file->getRealPath();
         }
@@ -328,7 +298,7 @@ class DirectoryHelper {
      * @param string           $renamePostfix
      * @return bool
      */
-    public function copyFile($file, $directory, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy") {
+    public function copyFile(File|string $file, Directory|string $directory, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy"): bool {
         $filePath = $file instanceof File ? $file->getRealPath() : $file;
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
 
@@ -364,7 +334,7 @@ class DirectoryHelper {
      * @param string      $newName
      * @return bool
      */
-    public function renameFile($file, string $newName) {
+    public function renameFile(File|string $file, string $newName): bool {
         $filePath = $file instanceof File ? $file->getRealPath() : $file;
 
         if (file_exists($filePath)) {
@@ -391,7 +361,7 @@ class DirectoryHelper {
      * @param string           $renamePostfix
      * @return bool
      */
-    public function moveFile($file, $directory, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy") {
+    public function moveFile(File|string $file, Directory|string $directory, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy"): bool {
         $filePath = $file instanceof File ? $file->getRealPath() : $file;
 
         if (true === $this->copyFile($file, $directory, $overwrite, $rename, $renamePostfix)) {
@@ -408,9 +378,9 @@ class DirectoryHelper {
      * @param string           $pattern
      * @param string           $param
      * @return array|null
-     * @throws Exception
+     * @throws \Exception
      */
-    public function findFilesByRegex($directory, string $pattern, string $param = "name") {
+    public function findFilesByRegex(Directory|string $directory, string $pattern, string $param = "name"): ?array {
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
 
         if (file_exists($directoryPath) && is_dir($directoryPath)) {
@@ -426,7 +396,7 @@ class DirectoryHelper {
                         $responseCollection[] = $currentFile;
                     }
                 } else {
-                    throw new Exception("The file object has no function defined to retrieve the value of '" . $param . "' parameter");
+                    throw new \Exception("The file object has no function defined to retrieve the value of '" . $param . "' parameter");
                 }
             }
 
@@ -452,9 +422,9 @@ class DirectoryHelper {
      * @param string           $pattern
      * @param string           $param
      * @return mixed|null
-     * @throws Exception
+     * @throws \Exception
      */
-    public function findOneFileByPattern($directory, string $pattern, string $param = "name") {
+    public function findOneFileByPattern(Directory|string $directory, string $pattern, string $param = "name"): mixed {
         $matchingCollection = $this->findFilesByRegex($directory, $pattern, $param);
 
         if (is_array($matchingCollection) && count($matchingCollection) === 1) {
@@ -472,14 +442,14 @@ class DirectoryHelper {
      * @param bool   $recursive
      * @return bool|null
      */
-    public function createDirectory(string $pathname, int $mode = 0775, bool $recursive = true) {
+    public function createDirectory(string $pathname, int $mode = 0775, bool $recursive = true): ?bool {
         try {
             if (!file_exists($pathname)) {
                 return mkdir($pathname, $mode, $recursive);
             }
 
             return false;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             return null;
         }
     }
@@ -491,7 +461,7 @@ class DirectoryHelper {
      * @param bool             $recursive
      * @return bool
      */
-    public function removeDirectory($directory, bool $recursive = false) {
+    public function removeDirectory(Directory|string $directory, bool $recursive = false): bool {
         if ($directory instanceof Directory) {
             $directory = $directory->getRealPath();
         }
@@ -546,7 +516,7 @@ class DirectoryHelper {
      * @param string           $newName
      * @return bool
      */
-    public function renameDirectory($directory, string $newName) {
+    public function renameDirectory(Directory|string $directory, string $newName): bool {
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
 
         if (file_exists($directoryPath) && is_dir($directoryPath)) {
@@ -570,9 +540,9 @@ class DirectoryHelper {
      * @param string           $pattern
      * @param string           $param
      * @return array|null
-     * @throws Exception
+     * @throws \Exception
      */
-    public function findDirectoriesByPattern($directory, string $pattern, string $param = "name") {
+    public function findDirectoriesByPattern(Directory|string $directory, string $pattern, string $param = "name"): ?array {
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
 
         if (file_exists($directoryPath) && is_dir($directoryPath)) {
@@ -588,7 +558,7 @@ class DirectoryHelper {
                         $responseCollection[] = $currentDirectory;
                     }
                 } else {
-                    throw new Exception("The directory object has no function defined to retrieve the value of '" . $param . "' parameter");
+                    throw new \Exception("The directory object has no function defined to retrieve the value of '" . $param . "' parameter");
                 }
             }
 
@@ -614,9 +584,9 @@ class DirectoryHelper {
      * @param string           $pattern
      * @param string           $param
      * @return mixed|null
-     * @throws Exception
+     * @throws \Exception
      */
-    public function findOneDirectoryByPattern($directory, string $pattern, string $param = "name") {
+    public function findOneDirectoryByPattern(Directory|string $directory, string $pattern, string $param = "name"): mixed {
         $matchingCollection = $this->findDirectoriesByPattern($directory, $pattern, $param);
 
         if (is_array($matchingCollection) && count($matchingCollection) === 1) {
@@ -637,7 +607,7 @@ class DirectoryHelper {
      * @param string           $renamePostfix
      * @return bool
      */
-    public function copyDirectory($directory, $destination, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy") {
+    public function copyDirectory(Directory|string $directory, Directory|string $destination, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy"): bool {
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
         $destinationPath = $destination instanceof Directory ? $destination->getRealPath() : $destination;
 
@@ -689,7 +659,7 @@ class DirectoryHelper {
      * @param string           $renamePostfix
      * @return bool
      */
-    public function moveDirectory($directory, $destination, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy") {
+    public function moveDirectory(Directory|string $directory, Directory|string $destination, bool $overwrite = false, bool $rename = true, string $renamePostfix = "_copy"): bool {
         if (true === $this->copyDirectory($directory, $destination, $overwrite, $rename, $renamePostfix)) {
             return $this->removeDirectory($directory, true);
         }
@@ -706,7 +676,7 @@ class DirectoryHelper {
      * @param bool             $includeRoot
      * @return array
      */
-    public function tree($directory, ?string $baseDirectory = null, bool $includeRoot = false) {
+    public function tree(Directory|string $directory, ?string $baseDirectory = null, bool $includeRoot = false): array {
         $directoryPath = $directory instanceof Directory ? $directory->getRealPath() : $directory;
 
         // Define response array
@@ -738,11 +708,11 @@ class DirectoryHelper {
     /**
      * Rename file or directory with specified name.
      *
-     * @param string|File|Directory $item
+     * @param string|Directory|File $item
      * @param string                $newName
      * @return bool
      */
-    public function rename($item, string $newName) {
+    public function rename(Directory|File|string $item, string $newName): bool {
         if ($item instanceof File || (file_exists($item) && !is_dir($item))) {
             return $this->renameFile($item, $newName);
         } else if ($item instanceof Directory || (file_exists($item) && is_dir($item))) {
@@ -758,7 +728,7 @@ class DirectoryHelper {
      * @param string $path
      * @return bool|string
      */
-    public function getRealPath(string $path) {
+    public function getRealPath(string $path): bool|string {
         return realpath($path);
     }
 }

@@ -10,14 +10,14 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": ">=8.2",
         "ext-fileinfo": "*",
         "ext-json": "*",
-        "symfony/framework-bundle": "^4.1|^5.0"
+        "symfony/framework-bundle": "^7.0"
     },
     "require-dev": {
-        "kint-php/kint": "^3.0",
-        "symfony/phpunit-bridge": "^4.1|^5.0"
+        "kint-php/kint": "^5.1",
+        "symfony/phpunit-bridge": "^7.0"
     },
     "config": {
         "sort-packages": true
@@ -34,7 +34,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0.x-dev"
+            "dev-master": "3.0.x-dev"
         }
     }
 }

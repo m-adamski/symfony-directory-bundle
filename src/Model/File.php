@@ -3,177 +3,77 @@
 namespace Adamski\Symfony\DirectoryBundle\Model;
 
 use JsonSerializable;
-use SplFileInfo;
 
 class File implements JsonSerializable {
+    protected string $name;
+    protected string $path;
+    protected ?string $basePath;
+    protected ?string $baseHost;
+    protected string $pathName;
+    protected string $extension;
+    protected int $owner;
+    protected int $permissions;
+    protected int $accessTime;
+    protected int $modificationTime;
+    protected int $changeTime;
+    protected bool $writable;
+    protected bool $readable;
+    protected int $size;
+    protected ?string $mimeType;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $path;
-
-    /**
-     * @var string|null
-     */
-    protected $basePath;
-
-    /**
-     * @var string|null
-     */
-    protected $baseHost;
-
-    /**
-     * @var string
-     */
-    protected $pathName;
-
-    /**
-     * @var string
-     */
-    protected $extension;
-
-    /**
-     * @var int
-     */
-    protected $owner;
-
-    /**
-     * @var int
-     */
-    protected $permissions;
-
-    /**
-     * @var int
-     */
-    protected $accessTime;
-
-    /**
-     * @var int
-     */
-    protected $modificationTime;
-
-    /**
-     * @var int
-     */
-    protected $changeTime;
-
-    /**
-     * @var bool
-     */
-    protected $writable;
-
-    /**
-     * @var bool
-     */
-    protected $readable;
-
-    /**
-     * @var int
-     */
-    protected $size;
-
-    /**
-     * @var string|null
-     */
-    protected $mimeType;
-
-    /**
-     * File constructor.
-     */
     public function __construct() {
         $this->basePath = null;
         $this->baseHost = null;
         $this->mimeType = null;
     }
 
-    /**
-     * @return string
-     */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName(string $name) {
+    public function setName(string $name): void {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath() {
+    public function getPath(): string {
         return $this->path;
     }
 
-    /**
-     * @param string $path
-     */
-    public function setPath(string $path) {
+    public function setPath(string $path): void {
         $this->path = $path;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getBasePath() {
+    public function getBasePath(): ?string {
         return $this->basePath;
     }
 
-    /**
-     * @param string|null $basePath
-     */
-    public function setBasePath(?string $basePath) {
+    public function setBasePath(?string $basePath): void {
         $this->basePath = $basePath;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getBaseHost() {
+    public function getBaseHost(): ?string {
         return $this->baseHost;
     }
 
-    /**
-     * @param string|null $baseHost
-     */
-    public function setBaseHost(?string $baseHost) {
+    public function setBaseHost(?string $baseHost): void {
         $this->baseHost = $baseHost;
     }
 
-    /**
-     * @return string
-     */
-    public function getPathName() {
+    public function getPathName(): string {
         return $this->pathName;
     }
 
-    /**
-     * @param string $pathName
-     */
-    public function setPathName(string $pathName) {
+    public function setPathName(string $pathName): void {
         $this->pathName = $pathName;
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getRealPath() {
+    public function getRealPath(): bool|string {
         return realpath(
             $this->getPathName()
         );
     }
 
-    /**
-     * @return string|null
-     */
-    public function getRelativePath() {
+    public function getRelativePath(): ?string {
         if (null !== ($basePath = $this->getBasePath())) {
             if (false !== ($realPath = $this->getRealPath())) {
                 return preg_replace("/^" . preg_quote($basePath, "/") . "/", "", $realPath);
@@ -183,136 +83,79 @@ class File implements JsonSerializable {
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getExtension() {
+    public function getExtension(): string {
         return $this->extension;
     }
 
-    /**
-     * @param string $extension
-     */
-    public function setExtension(string $extension) {
+    public function setExtension(string $extension): void {
         $this->extension = $extension;
     }
 
-    /**
-     * @return int
-     */
-    public function getOwner() {
+    public function getOwner(): int {
         return $this->owner;
     }
 
-    /**
-     * @param int $owner
-     */
-    public function setOwner(int $owner) {
+    public function setOwner(int $owner): void {
         $this->owner = $owner;
     }
 
-    /**
-     * @return int
-     */
-    public function getPermissions() {
+    public function getPermissions(): int {
         return $this->permissions;
     }
 
-    /**
-     * @param int $permissions
-     */
-    public function setPermissions(int $permissions) {
+    public function setPermissions(int $permissions): void {
         $this->permissions = $permissions;
     }
 
-    /**
-     * @return int
-     */
-    public function getAccessTime() {
+    public function getAccessTime(): int {
         return $this->accessTime;
     }
 
-    /**
-     * @param int $accessTime
-     */
-    public function setAccessTime(int $accessTime) {
+    public function setAccessTime(int $accessTime): void {
         $this->accessTime = $accessTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getModificationTime() {
+    public function getModificationTime(): int {
         return $this->modificationTime;
     }
 
-    /**
-     * @param int $modificationTime
-     */
-    public function setModificationTime(int $modificationTime) {
+    public function setModificationTime(int $modificationTime): void {
         $this->modificationTime = $modificationTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getChangeTime() {
+    public function getChangeTime(): int {
         return $this->changeTime;
     }
 
-    /**
-     * @param int $changeTime
-     */
-    public function setChangeTime(int $changeTime) {
+    public function setChangeTime(int $changeTime): void {
         $this->changeTime = $changeTime;
     }
 
-    /**
-     * @return bool
-     */
-    public function isWritable() {
+    public function isWritable(): bool {
         return $this->writable;
     }
 
-    /**
-     * @param bool $writable
-     */
-    public function setWritable(bool $writable) {
+    public function setWritable(bool $writable): void {
         $this->writable = $writable;
     }
 
-    /**
-     * @return bool
-     */
-    public function isReadable() {
+    public function isReadable(): bool {
         return $this->readable;
     }
 
-    /**
-     * @param bool $readable
-     */
-    public function setReadable(bool $readable) {
+    public function setReadable(bool $readable): void {
         $this->readable = $readable;
     }
 
-    /**
-     * @return int
-     */
-    public function getSize() {
+    public function getSize(): int {
         return $this->size;
     }
 
-    /**
-     * @param int $size
-     */
-    public function setSize(int $size) {
+    public function setSize(int $size): void {
         $this->size = $size;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHumanSize() {
+    public function getHumanSize(): ?string {
         $sizeCheck = [
             1             => "B",
             1024          => "kB",
@@ -337,24 +180,15 @@ class File implements JsonSerializable {
         return null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMimeType() {
+    public function getMimeType(): ?string {
         return $this->mimeType;
     }
 
-    /**
-     * @param string|null $mimeType
-     */
-    public function setMimeType(?string $mimeType) {
+    public function setMimeType(?string $mimeType): void {
         $this->mimeType = $mimeType;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNameWithoutExtension() {
+    public function getNameWithoutExtension(): ?string {
         if (null !== ($currentExtension = $this->getExtension())) {
             if ("" !== $currentExtension) {
                 return preg_replace("/" . preg_quote("." . $currentExtension, "/") . "$/", "", $this->getName());
@@ -364,10 +198,7 @@ class File implements JsonSerializable {
         return null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getUrl() {
+    public function getUrl(): ?string {
         if (null !== ($baseHost = $this->getBaseHost())) {
             if (null !== ($relativePath = $this->getRelativePath())) {
                 return rtrim($this->getBaseHost(), "/") . "/" . ltrim(str_replace("\\", "/", $this->getRelativePath()), "/");
@@ -377,17 +208,11 @@ class File implements JsonSerializable {
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getHash() {
+    public function getHash(): string {
         return md5($this->getPathName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerialize() {
+    public function jsonSerialize(): array {
         return [
             "type"                 => "file",
             "name"                 => $this->getName(),
@@ -409,13 +234,7 @@ class File implements JsonSerializable {
         ];
     }
 
-    /**
-     * @param SplFileInfo $fileInfo
-     * @param string|null $baseDirectory
-     * @param string|null $baseHost
-     * @return File
-     */
-    public static function parse(SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null) {
+    public static function parse(\SplFileInfo $fileInfo, ?string $baseDirectory = null, ?string $baseHost = null): File {
         $currentFile = new File();
         $currentFile->setName($fileInfo->getFilename());
         $currentFile->setPath($fileInfo->getPath());

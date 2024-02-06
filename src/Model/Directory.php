@@ -3,277 +3,137 @@
 namespace Adamski\Symfony\DirectoryBundle\Model;
 
 use JsonSerializable;
-use SplFileInfo;
 
 class Directory implements JsonSerializable {
+    protected string $name;
+    protected string $path;
+    protected string $pathName;
+    protected int $owner;
+    protected int $permissions;
+    protected int $accessTime;
+    protected int $modificationTime;
+    protected int $changeTime;
+    protected bool $writable;
+    protected bool $readable;
+    protected int $directoriesCounter;
+    protected int $filesCounter;
+    protected int $summarySize;
 
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $path;
-
-    /**
-     * @var string
-     */
-    protected $pathName;
-
-    /**
-     * @var int
-     */
-    protected $owner;
-
-    /**
-     * @var int
-     */
-    protected $permissions;
-
-    /**
-     * @var int
-     */
-    protected $accessTime;
-
-    /**
-     * @var int
-     */
-    protected $modificationTime;
-
-    /**
-     * @var int
-     */
-    protected $changeTime;
-
-    /**
-     * @var bool
-     */
-    protected $writable;
-
-    /**
-     * @var bool
-     */
-    protected $readable;
-
-    /**
-     * @var int
-     */
-    protected $directoriesCounter;
-
-    /**
-     * @var int
-     */
-    protected $filesCounter;
-
-    /**
-     * @var int
-     */
-    protected $summarySize;
-
-    /**
-     * @return string
-     */
-    public function getName() {
+    public function getName(): string {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName(string $name) {
+    public function setName(string $name): void {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath() {
+    public function getPath(): string {
         return $this->path;
     }
 
-    /**
-     * @param string $path
-     */
-    public function setPath(string $path) {
+    public function setPath(string $path): void {
         $this->path = $path;
     }
 
-    /**
-     * @return string
-     */
-    public function getPathName() {
+    public function getPathName(): string {
         return $this->pathName;
     }
 
-    /**
-     * @param string $pathName
-     */
-    public function setPathName(string $pathName) {
+    public function setPathName(string $pathName): void {
         $this->pathName = $pathName;
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getRealPath() {
+    public function getRealPath(): bool|string {
         return realpath(
             $this->getPathName()
         );
     }
 
-    /**
-     * @return int
-     */
-    public function getOwner() {
+    public function getOwner(): int {
         return $this->owner;
     }
 
-    /**
-     * @param int $owner
-     */
-    public function setOwner(int $owner) {
+    public function setOwner(int $owner): void {
         $this->owner = $owner;
     }
 
-    /**
-     * @return int
-     */
-    public function getPermissions() {
+    public function getPermissions(): int {
         return $this->permissions;
     }
 
-    /**
-     * @param int $permissions
-     */
-    public function setPermissions(int $permissions) {
+    public function setPermissions(int $permissions): void {
         $this->permissions = $permissions;
     }
 
-    /**
-     * @return int
-     */
-    public function getAccessTime() {
+    public function getAccessTime(): int {
         return $this->accessTime;
     }
 
-    /**
-     * @param int $accessTime
-     */
-    public function setAccessTime(int $accessTime) {
+    public function setAccessTime(int $accessTime): void {
         $this->accessTime = $accessTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getModificationTime() {
+    public function getModificationTime(): int {
         return $this->modificationTime;
     }
 
-    /**
-     * @param int $modificationTime
-     */
-    public function setModificationTime(int $modificationTime) {
+    public function setModificationTime(int $modificationTime): void {
         $this->modificationTime = $modificationTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getChangeTime() {
+    public function getChangeTime(): int {
         return $this->changeTime;
     }
 
-    /**
-     * @param int $changeTime
-     */
-    public function setChangeTime(int $changeTime) {
+    public function setChangeTime(int $changeTime): void {
         $this->changeTime = $changeTime;
     }
 
-    /**
-     * @return bool
-     */
-    public function isWritable() {
+    public function isWritable(): bool {
         return $this->writable;
     }
 
-    /**
-     * @param bool $writable
-     */
-    public function setWritable(bool $writable) {
+    public function setWritable(bool $writable): void {
         $this->writable = $writable;
     }
 
-    /**
-     * @return bool
-     */
-    public function isReadable() {
+    public function isReadable(): bool {
         return $this->readable;
     }
 
-    /**
-     * @param bool $readable
-     */
-    public function setReadable(bool $readable) {
+    public function setReadable(bool $readable): void {
         $this->readable = $readable;
     }
 
-    /**
-     * @return int
-     */
-    public function getDirectoriesCounter() {
+    public function getDirectoriesCounter(): int {
         return $this->directoriesCounter;
     }
 
-    /**
-     * @param int $directoriesCounter
-     */
-    public function setDirectoriesCounter(int $directoriesCounter) {
+    public function setDirectoriesCounter(int $directoriesCounter): void {
         $this->directoriesCounter = $directoriesCounter;
     }
 
-    /**
-     * @return int
-     */
-    public function getFilesCounter() {
+    public function getFilesCounter(): int {
         return $this->filesCounter;
     }
 
-    /**
-     * @param int $filesCounter
-     */
-    public function setFilesCounter(int $filesCounter) {
+    public function setFilesCounter(int $filesCounter): void {
         $this->filesCounter = $filesCounter;
     }
 
-    /**
-     * @return int
-     */
-    public function getSummaryCounter() {
+    public function getSummaryCounter(): int {
         return $this->getFilesCounter() + $this->getDirectoriesCounter();
     }
 
-    /**
-     * @return int
-     */
-    public function getSummarySize() {
+    public function getSummarySize(): int {
         return $this->summarySize;
     }
 
-    /**
-     * @param int $summarySize
-     */
-    public function setSummarySize(int $summarySize) {
+    public function setSummarySize(int $summarySize): void {
         $this->summarySize = $summarySize;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getHumanSummarySize() {
+    public function getHumanSummarySize(): ?string {
         $sizeCheck = [
             1             => "B",
             1024          => "kB",
@@ -298,17 +158,11 @@ class Directory implements JsonSerializable {
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getHash() {
+    public function getHash(): string {
         return md5($this->getPathName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerialize() {
+    public function jsonSerialize(): array {
         return [
             "type"               => "directory",
             "name"               => $this->getName(),
@@ -328,11 +182,7 @@ class Directory implements JsonSerializable {
         ];
     }
 
-    /**
-     * @param SplFileInfo $fileInfo
-     * @return Directory
-     */
-    public static function parse(SplFileInfo $fileInfo) {
+    public static function parse(\SplFileInfo $fileInfo): Directory {
         $currentDirectory = new Directory();
         $currentDirectory->setName($fileInfo->getFilename());
         $currentDirectory->setPath($fileInfo->getPath());
